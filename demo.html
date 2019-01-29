@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html onselectstart="return false">
+<head lang="en">
+    /*onselectstart="return false"*/
+    <meta charset="UTF-8">
+    <title>document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            background-color: #000;
+        }
+        div.pic{
+            width: 120px;
+            height: 180px; /* 133:200 4:6  */
+            /*border: 1px dotted #f00;*/
+            margin: 200px auto 0;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(800px) rotateX(-10deg) rotateY(0deg);
+        }
+        div.pic img{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 5px; /*round the corner*/
+            box-shadow: 0px 0px 10px #fff;/*box-shadow*/
+            -webkit-box-reflect: below 10px -webkit-linear-gradient(top,rgba(0,0,0,0) 50%,rgba(0,0,0,0.5) 100%); /*box-reflect*/
+            /*-webkit-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,1)*/
+        }
+        div.pic p{
+            width: 1200px;
+            height: 1200px;
+            background: -webkit-radial-gradient(center center,600px 600px,rgba(255,255,255,0.3),rgba(0,0,0,0));
+            left: 50%;top: 100%;
+            margin-top: -50px;
+            margin-left: -600px;
+            transform: rotateX(90deg);
+            border-radius: 600px;
+        }
+    </style>
+</head>
+<body>
+    <!--div-->
+    <div class="pic">
+        <img src="./images/photo/photo-1.jpg" alt="1.jpg"/>
+        <img src="./images/photo/photo-2.jpg" alt="2.jpg"/>
+        <img src="./images/photo/photo-3.jpg" alt="3.jpg"/>
+        <img src="./images/photo/photo-4.jpg" alt="4.jpg"/>
+        <img src="./images/photo/photo-5.jpg" alt="5.jpg"/>
+        <img src="./images/photo/photo-6.jpg" alt="6.jpg"/>
+        <img src="./images/photo/photo-7.jpg" alt="7.jpg"/>
+        <img src="./images/photo/photo-8.jpg" alt="8.jpg"/>
+        <img src="./images/photo/photo-9.jpg" alt="9.jpg"/>
+        <img src="./images/photo/photo-10.jpg" alt="10.jpg"/>
+        <p></p>
+    </div>
+    <script src="js/jquery-1.7.2.min.js"></script>
+    <script>
+        $(function(){
+            //initial variable
+            var translate=800;
+            document.addEventListener("mousewheel",function(e){  
+                var distance=50 
+                if(e.wheelDelta>0){    
+                   clearInterval(play)
+                   translate+=distance               
+                   $("div.pic").css({
+                            transform:'perspective('+translate+'px) rotateX('+toX+'deg)  rotateY('+toY+'deg)'
+                   });  //css3
+                     
+                }else if(e.wheelDelta<0){
+                    clearInterval(play)
+                   translate-=distance                
+                   $("div.pic").css({
+                            transform:'perspective('+translate+'px) rotateX('+toX+'deg)  rotateY('+toY+'deg)'
+                   });
+                }
+            })
+            var imgL = $("div.pic img").size();  //img count
+//            alert(imgL);
+            var deg = 360 / imgL;   //angle
+            var toY = 0, toX = -10;
+            var xN = 0,yN = 0;
+            var play = null;
+
+            $("div.pic img").each(function(i){
+                $(this).css({
+                    'transform':'rotateY('+i*deg+'deg) translateZ(350px)' 
+                });
+                $(this).attr("ondragstart","return false");
+            });
+            $(document).on('mousedown touchstart',function(ev){
+                /*console.log("shu biao an xia le !");*/
+                var x_ = ev.clientX || ev.originalEvent.changedTouches[0].clientX;
+                var y_ = ev.clientY || ev.originalEvent.changedTouches[0].clientY;
+                clearInterval(play);
+                $(this).bind("mousemove touchmove",(function(ev){
+                  /* console.log('yi dong !');*/
+                    var x = ev.clientX || ev.originalEvent.changedTouches[0].clientX;
+                    var y = ev.clientY || ev.originalEvent.changedTouches[0].clientY;
+                    xN = x - x_;
+                    yN = y - y_;
+                    toY += xN*0.2;
+                    toX -= yN*0.1;
+
+                    //$("body").append('<div style="width:5px;height:5px;background:#f00;position:absolute;top:"+y+"px;left:"+x+"px;"></div>')/*/
+                    $("div.pic").css({
+                       transform:'perspective('+translate+'px) rotateX('+toX+'deg)  rotateY('+toY+'deg)'
+                    });
+                    x_ = ev.clientX || ev.originalEvent.changedTouches[0].clientX;
+                    y_ = ev.clientY || ev.originalEvent.changedTouches[0].clientY;
+                }));
+            }).on('mouseup touchend',function(){
+                    $(this).unbind("mousemove touchmove");
+                    var play = setInterval(function(){
+                        xN *= 0.95;
+                        yN *= 0.95;
+                        if ( Math.abs(xN) < 1 && Math.abs(yN) < 1 )/*Math绝对值*/clearInterval(play);
+                        toY += xN*0.2;
+                        toX -= yN*0.1;
+                        $("div.pic").css({
+                            transform:'perspective('+translate+'px) rotateX('+toX+'deg)  rotateY('+toY+'deg)'
+                        });
+                    },30);
+                    //return play
+            });
+        });
+    </script>
+</body>
+</html>
